@@ -168,6 +168,8 @@ print(wlan.ifconfig())
   - Everything else (esp. stuff that touches networking hardware) should be considered experimental
 
 <!--
+  here's the obligatory warning
+
   I'm treating Pico W as "a normal computer" whenever I can. This is not trivial at all. This is made trivial thanks to R2P2 (shell system).
 -->
 
