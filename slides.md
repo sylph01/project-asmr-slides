@@ -15,7 +15,7 @@ theme: argent
 
 # Slides are available at:
 
-## TBD (also change the image)
+## https://speakerdeck.com/sylph01/adding-security-to-microcontroller-ruby
 
 ![bg right](images/frame.png)
 
@@ -139,6 +139,10 @@ print(wlan.ifconfig())
 
 <!--
   _class: stacking-headers
+-->
+
+<!--
+  I came up with this name while writing the CfP
 -->
 
 ----
@@ -274,7 +278,7 @@ print(wlan.ifconfig())
 (@ mentions are in GitHub ID)
 
 - Major shoutouts to @hasumikin for the extensive work in PicoRuby and helping me develop stuff on it
-- Past RubyKaigi speakers, esp. @unasuke and @shioimm
+- Past RubyKaigi speakers, esp. @unasuke and @shioimm (Team Protocol Implementers!)
 
 And to the organizers of RubyKaigi 2024!
 
