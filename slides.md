@@ -95,6 +95,7 @@ that is more relevant to this talk:
 
 - Board with RP2040 microcontroller
   - Dual-core ARM Cortex-M0+ @ 133MHz
+  - **264kB SRAM**, 2MB Flash
 - Wireless LAN (802.11n) with CYW43439
 - 1353 yen (as of 4/18/2024)
   - 技適 certified!
@@ -105,6 +106,8 @@ that is more relevant to this talk:
   https://www.switch-science.com/products/8171
 
   it's 技適 certified so we can legally use wireless functionality in Japan!
+
+  btw the size of SRAM becomes important later
 -->
 
 ----
