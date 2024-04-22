@@ -214,10 +214,18 @@ print(wlan.ifconfig())
 - General overview of what was missing
 - What do we mean by Networking here
   - WiFi, TCP/IP
-- Porting of MicroPython's Networking
-  - details
 - Debugging Networking
   - you have kali in your house right
+  - setup hostapd, listen with wireshark
+- misc
+  - mruby/c's String's actual C representation is guaranteed to be null-terminated https://github.com/mrubyc/mrubyc/blob/master/src/c_string.c#L71-L103
+
+----
+
+- Basic HTTP is easy
+- DNS?
+- TLS?
+- Tying it all together: HTTPS
 
 ----
 
@@ -227,17 +235,17 @@ print(wlan.ifconfig())
 
 # Part 3:
 
-# Networking in the Upper Layer
+# Fleshing Out Networking
 
 ----
 
 (overview)
 
-- Now that we have sockets
-- Basic HTTP is easy
-- DNS?
-- TLS?
-- Tying it all together: HTTPS
+- Look & Feel of the API
+- Blocking vs Non-Blocking
+- Porting of MicroPython's Networking
+  - details
+  - Sockets?
 
 ----
 
@@ -273,7 +281,6 @@ print(wlan.ifconfig())
 
 # Possible Future Work in IoT area
 
-- (yes, finish everything first, but...)
 - CBOR/COSE/CoAP support
   - Think of it as "JSON in binary"
 - There are working groups in the IETF geared towards "constrained environments"
