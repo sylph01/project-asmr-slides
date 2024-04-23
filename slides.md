@@ -154,6 +154,8 @@ print(wlan.ifconfig())
 
 <!--
   I came up with this name while writing the CfP
+
+  It's more like "Adding Networking to PicoRuby" but yes I took the meme value
 -->
 
 ----
