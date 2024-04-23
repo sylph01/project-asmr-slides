@@ -165,16 +165,26 @@ print(wlan.ifconfig())
 # Caution: Here be dragons
 
 - Cryptographic API is prone to misuse
-- Embedded bugs are hard
 - Most implementation here are experimental
   - Gems that entered PicoRuby/R2P2 are pretty much "prod-ready"
   - Everything else (esp. stuff that touches networking hardware) should be considered experimental
 
 <!--
   here's the obligatory warning
-
-  I'm treating Pico W as "a normal computer" whenever I can. This is not trivial at all. This is made trivial thanks to R2P2 (shell system).
 -->
+
+----
+
+# Caution: Embedded bugs are hard
+
+I'm treating Pico W as "a normal computer" whenever I can.
+
+**This is not trivial at all.** There could be many random stuff I am missing.
+
+This is possible thanks to:
+
+- Pico SDK (including lwIP, Mbed TLS)
+- R2P2 (shell system)
 
 ----
 
@@ -225,10 +235,24 @@ print(wlan.ifconfig())
 
 ----
 
-- Basic HTTP is easy
-- DNS?
-- TLS?
-- Tying it all together: HTTPS
+- Connect to WiFi AP with CYW43
+- Introduction to lwIP
+- DNS
+  - actually this was easy
+- TCP Client
+  - Application Layered TCP
+- If you have TCP Client then Basic HTTP is easy
+
+----
+
+- TLS
+  - with lwIP and ALTCP TLS is pretty trivial
+  - Implementation quirks
+    - you cannot call `malloc()` and `free()`
+      - They are libc functions. If you do it hangs up
+      - `mrbc_raw_alloc`, also lwIP has its own memory management
+    - OOM
+      - to enable TLS I had to reduce R2P2's heap memory significantly
 
 ----
 
