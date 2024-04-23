@@ -284,7 +284,30 @@ This is possible thanks to:
 
 ----
 
-# Conclusion
+# Stuff delivered
+
+- In PicoRuby/R2P2 now!
+  - Base16, Base64
+  - SHA256
+  - AES Encryption (CBC, GCM)
+  - Random Number Generator
+
+----
+
+# Stuff delivered (cont)
+
+- Experimental
+  - CYW43
+    - Connect to WiFi
+  - Net
+    - DNS
+    - TCPClient
+    - HTTP(S)Client
+      - GET
+
+----
+
+<!-- _class: titlepage -->
 
 # We **can haz** TLS in PicoRuby!
 
