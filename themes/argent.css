@@ -55,6 +55,12 @@ section h3 strong {
     color: #4189AC;
 }
 
+section.titlepage_white h1 strong,
+section.titlepage_white h2 strong,
+section.titlepage_white h3 strong {
+  color: #f78e88;
+}
+
 /* used in project-asmr's title page */
 section.stacking-headers h1 {
   font-size: 80px;

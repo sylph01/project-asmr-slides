@@ -323,11 +323,65 @@ This is possible thanks to:
     - RSA 2048 Signing: 9.208 ops/sec
     - RSA 2048 Verfiication: **0.155 ops/sec**
     - ECDHE 256 Key agreement: **0.661 ops/sec**
-- Depending on your security needs, it would be enough to **just use symmetric crypto** between the gateway and use TLS from there
+
+----
+
+# But do we **really** need TLS?
+
+Also, without a trust store, we will get **encryption** through TLS, but we will not get the **authentication** part of TLS.
+
+For these reasons, depending on your security needs, it would be enough to **just use symmetric crypto** between the gateway and use TLS from there.
 
 <!--
+  In this case, the gateway has a trust store (trusted certificate list) and thus will be capable of authentication.
+
   Note: In this case you have to provision your devices with a fixed symmetric key. Physical compromise of the device is possible. But do you even care about that in most cases?
 -->
+
+----
+
+## You might want to use a **Raspberry Pi Zero 2 W** if you want a "more traditional" computer experience
+
+Runs a Linux, can SSH into it, can run a GUI, has enough power to run asymmetric crypto
+
+![bg right:35%](images/PXL_20240424_142957171.jpg)
+
+----
+
+# Why use a Pico?
+
+**It's closer to hardware.** It's easier to embed into other hardware.
+
+![bg right:35%](images/pi_pico_w.jpg)
+
+
+----
+
+<!--
+  _class: titlepage_white
+-->
+
+# In an IoT environment,
+
+# these devices **work in concert**
+
+![bg brightness:0.3](images/PXL_20240424_142957171.jpg)
+
+![bg brightness:0.3](images/pi_pico_w.jpg)
+
+----
+
+<!--
+  _class: titlepage_white
+-->
+
+# With Pico's WiFi connectivity,
+
+# we can say **Actual IoT with Ruby** is closer to a reality!
+
+![bg brightness:0.2](images/PXL_20240424_142957171.jpg)
+
+![bg brightness:0.75](images/pi_pico_w.jpg)
 
 ----
 
