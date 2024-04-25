@@ -188,6 +188,8 @@ print(wlan.ifconfig())
 
 # [Demonstration](https://youtu.be/oYiBG7P2yyE)
 
+If you want to see it in person, come find me any time during the Kaigi!
+
 ----
 
 # Caution: Here be dragons
@@ -256,8 +258,8 @@ This is possible thanks to:
 - What do we mean by Networking here
   - WiFi, TCP/IP
 - Debugging Networking
-  - you have kali in your house right
-  - setup hostapd, listen with wireshark
+  - Use RasPi 5 as a WiFi router
+  - Wireshark
 - misc
   - mruby/c's String's actual C representation is guaranteed to be null-terminated https://github.com/mrubyc/mrubyc/blob/master/src/c_string.c#L71-L103
 
@@ -312,6 +314,14 @@ This is possible thanks to:
 
 ----
 
+<!-- _class: titlepage_white -->
+
+# We **can haz** TLS in PicoRuby!
+
+![bg brightness:0.5](images/IMG_0468.JPG)
+
+----
+
 # Stuff delivered
 
 - In PicoRuby/R2P2 now!
@@ -332,12 +342,6 @@ This is possible thanks to:
     - TCPClient
     - HTTP(S)Client
       - GET
-
-----
-
-<!-- _class: titlepage -->
-
-# We **can haz** TLS in PicoRuby!
 
 ----
 
@@ -419,6 +423,23 @@ Runs a Linux, can SSH into it, can run a GUI, has enough power to run asymmetric
   - Authentication and Authorization for Constrained Environments
   - Lightweight Authenticated Key Exchange
   - Software Updates for Internet of Things
+
+----
+
+<!--
+  _class: titlepage_white
+-->
+
+# It's a **Blue Ocean**
+
+![bg brightness:0.75](images/IMG_0523.JPG)
+
+<!--
+  The community is waiting for your contribution!
+
+  btw I'm using an image of the Setouchi Sea as a placeholder;
+  I need to get one from Okinawa
+-->
 
 ----
 
