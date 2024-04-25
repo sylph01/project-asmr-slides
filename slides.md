@@ -154,8 +154,34 @@ print(wlan.ifconfig())
 
 <!--
   I came up with this name while writing the CfP
+-->
 
-  It's more like "Adding Networking to PicoRuby" but yes I took the meme value
+----
+
+# More like
+# Adding
+# **SSL/TLS** to
+# Microcontroller
+# Ruby
+
+<!--
+  _class: stacking-headers
+-->
+
+----
+
+# or
+# Adding
+# **Networking** to
+# Microcontroller
+# Ruby
+
+<!--
+  _class: stacking-headers
+-->
+
+<!--
+  but meme value, right?
 -->
 
 ----
