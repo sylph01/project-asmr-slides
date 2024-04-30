@@ -62,16 +62,6 @@ that is more relevant to this talk:
   - HTTPS in Local Network CG / Web of Things WG @ W3C, OAuth / Messaging Layer Security WG @ IETF
 - Worked as an Officer of Internet Society Japan Chapter (2020-23)
 
----
-
-<!-- _class: titlepage -->
-
-# I'm from the **Forgotten Realm** of Japan called **Shikoku**
-
-![bg right:40% contain](images/DcwvXpdX4AA9x1Q.jpeg)
-
-<!-- _footer: image https://twitter.com/Mitchan_599/status/994221711942971392 -->
-
 ----
 
 ----
