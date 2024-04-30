@@ -427,7 +427,7 @@ Runs a Linux, can SSH into it, can run a GUI, has enough power to run asymmetric
 ----
 
 <!--
-  _class: titlepage_white
+  _class: titlepage_white center
 -->
 
 # It's a **Blue Ocean**
