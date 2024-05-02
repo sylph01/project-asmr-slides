@@ -265,23 +265,203 @@ plain += decipher.final
 
 ----
 
-# 
+# OpenSSL is too big, what do we do?
 
+- There are cryptographic libraries for embedded systems
+  - Mbed TLS, wolfSSL
+- Pico SDK uses **Mbed TLS**
+- Mbed TLS has build options to only include needed functionality
+  - See `R2P2/include/mbedtls_config.h`
 
 ----
 
-(overview)
+# PicoRuby didn't have Base16/64
 
-- we have Mbed TLS instead of OpenSSL
-- PicoRuby had an implementation of CMAC using Mbed TLS
-- actual impl details
-  - Generating mruby/c objects compared with CRuby objects
-    - Reference counters...
-  - SHA-256, AES-CBC/GCM
-    - Does not perform operations all at once. We are in a restricted environment
-- Did I say "don't use fixed nonces"
-  - RNG? it's not a given, we need to implement that
-    - RNG using Ring Oscillator, von Neumann whitening
+- Because Base16/64 is for humans, not for devices!
+- What's Base16? It's `Array#pack` with `H*`
+- I added this first so that debugging cryptography is easier
+
+----
+
+# AES in PicoRuby + Mbed TLS
+
+```ruby
+require 'mbedtls'
+require 'base64'
+key = Base64.decode64 "aGB7hvLWxE60PsxbPS9wsA=="
+iv  = Base64.decode64 "J4b4xJuIHry/aUpVeyRIJw=="
+cipher = MbedTLS::Cipher.new(:aes_128_cbc, key, :encrypt)
+cipher.set_iv(iv)
+s = cipher.update('asdfasdfasdfasdfasdf')
+s << cipher.finish
+Base64.encode64 s
+```
+
+----
+
+# SHA256 in PicoRuby + Mbed TLS
+
+```ruby
+require 'mbedtls'
+require 'base16'
+digest = MbedTLS::Digest.new(:sha256)
+digest.update('asdf')
+s = digest.finish
+Base16.encode16 s
+```
+
+----
+
+# Mbed TLS in PicoRuby
+
+- PicoRuby already had CMAC using Mbed TLS
+- I added the most commonly used algorithms:
+  - AES-(128/192/256)
+    - non-AEAD: CBC mode
+    - AEAD: GCM mode
+  - SHA-256
+
+----
+
+# Implementation Details
+## or Introduction to mruby/c Extensions
+
+----
+
+# mruby/c vs CRuby
+
+- We can wrap C values inside a Ruby object
+  - CRuby: `RTYPEDDATA_DATA(obj)`
+  - mruby/c: create an instance with
+    `mrbc_instance_new(vm, v->cls, sizeof(C_VAL_TO_WRAP))`
+  - Here, we want to wrap the "context" struct created by OpenSSL or mbed TLS
+
+----
+
+# mruby/c vs CRuby
+
+- Defining methods
+  - CRuby: `rb_define_method`
+    - Takes a class, name, function pointer, and number of args
+    - Get arguments from the function's arguments
+  - mruby/c: `mrbc_define_method`
+    - Takes a pointer to VM, class, name, function pointer
+    - Get arguments using `GET_ARG(POSITION)`
+
+----
+
+```c
+static void
+c_mbedtls_digest__init_ctx(mrbc_vm *vm, mrbc_value *v, int argc)
+{
+  /* (snip) argument check */
+  mrbc_value algorithm = GET_ARG(1);
+  mrbc_value self = mrbc_instance_new(vm, v->cls, sizeof(mbedtls_md_context_t));
+  mbedtls_md_context_t *ctx = (mbedtls_md_context_t *)self.instance->data;
+  mbedtls_md_init(ctx);
+
+  const mbedtls_md_info_t *md_info = mbedtls_md_info_from_type(
+    c_mbedtls_digest_algorithm_name(mrbc_integer(algorithm))
+  );
+  int ret;
+  ret = mbedtls_md_setup(ctx, md_info, 0);
+  // error check
+  ret = mbedtls_md_starts(ctx);
+  // error check
+
+  SET_RETURN(self);
+}
+```
+
+----
+
+```c
+static void
+c_mbedtls_digest_update(mrbc_vm *vm, mrbc_value *v, int argc)
+{
+  /* (snip) argument check */
+  mrbc_value input = GET_ARG(1);
+
+  int ret;
+  mbedtls_md_context_t *ctx = (mbedtls_md_context_t *)v->instance->data;
+  ret = mbedtls_md_update(ctx, input.string->data, input.string->size);
+  // error check
+
+  mrbc_incref(&v[0]);
+  SET_RETURN(*v);
+}
+```
+
+<!--
+We first take the wrapped context from the instance, then pass it to Mbed TLS's functions.
+
+When you define an instance method, you want to call `mrbc_incref` to prevent the object from being GCed.
+-->
+
+----
+
+# One-shot API?
+
+In a memory-constrained environment, it's better to have multiple-call APIs instead of one-shot APIs, because to use the one-shot API, you need twice the memory of the original string.
+
+<!--
+With multiple-call APIs, we can process partially encrypted strings (send them) then free that buffer to continue with the rest.
+
+You can of course write wrappers though.
+-->
+
+----
+
+# Did I say "don't use fixed nonces"
+
+- It reduces security significantly
+  - cf. PlayStation 3's code signing key leak (ECDSA)
+- We need a **Random Number Generator**
+  - But do we have `/dev/random` ... No!
+  - We use the **Ring Oscillator (ROSC)** to extract random bits
+  - You can use this through the `RNG` gem
+
+----
+
+![bg fit](images/Screenshot_20240503_074915.png)
+
+<!--
+https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf
+
+2.17.5. Random Number Generator
+
+This does not meet the requirements of randomness for security systems because it can be compromised,
+but it may be useful in less critical applications. If the cores are running from the ROSC then the value will not be
+random because the timing of the register read will be correlated to the phase of the ROSC.
+-->
+
+----
+
+```c
+uint8_t c_rng_random_byte_impl(void)
+{
+  uint32_t random = 0;
+  uint32_t bit = 0;
+  for (int i = 0; i < 8; i++) {
+    while (true) {
+      bit = rosc_hw->randombit;
+      sleep_us(5);
+      if (bit != rosc_hw->randombit)
+        break;
+    }
+    random = (random << 1) | bit;
+    sleep_us(5);
+  }
+  return (uint8_t) random;
+}
+```
+
+<!--
+We use a technique called "von Neumann whitening",
+where we turn the ups and downs of the sequence into 1s and 0s,
+instead of using the 0s and 1s directly from the output.
+This decreases the bias of the output. 
+-->
 
 ----
 
