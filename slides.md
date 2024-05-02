@@ -217,6 +217,59 @@ This is possible thanks to:
 
 ----
 
+# Quick Recap: SHA256 in Ruby
+
+```ruby
+require 'openssl'
+
+digest = OpenSSL::Digest.new('sha256')
+digest.update('The magic words are ')
+digest.update('squeamish ossifrage.')
+
+OpenSSL::Digest::SHA256.hexdigest(
+  'The magic words are squeamish ossifrage.'
+)
+```
+
+----
+
+# Quick Recap: AES in Ruby (encryption)
+
+```ruby
+require 'openssl'
+
+cipher = OpenSSL::Cipher::AES128.new('CBC')
+cipher.encrypt
+key = cipher.random_key
+iv  = cipher.random_iv
+
+enc =  cipher.update('The magic words are ')
+enc += cipher.update('squeamish ossifrage.')
+enc += cipher.final
+```
+
+----
+
+# Quick Recap: AES in Ruby (decryption)
+
+```ruby
+# cont'd
+decipher = OpenSSL::Cipher::AES128.new('CBC')
+decipher.decrypt
+decipher.key = key
+decipher.iv  = iv
+
+plain =  decipher.update(enc)
+plain += decipher.final
+```
+
+----
+
+# 
+
+
+----
+
 (overview)
 
 - we have Mbed TLS instead of OpenSSL
@@ -422,13 +475,10 @@ Runs a Linux, can SSH into it, can run a GUI, has enough power to run asymmetric
 
 # It's a **Blue Ocean**
 
-![bg brightness:0.75](images/IMG_0523.JPG)
+![bg brightness:0.9](images/DSCF0156.jpeg)
 
 <!--
   The community is waiting for your contribution!
-
-  btw I'm using an image of the Setouchi Sea as a placeholder;
-  I need to get one from Okinawa
 -->
 
 ----
