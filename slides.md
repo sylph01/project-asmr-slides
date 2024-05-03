@@ -373,6 +373,10 @@ c_mbedtls_digest__init_ctx(mrbc_vm *vm, mrbc_value *v, int argc)
 }
 ```
 
+<!--
+  _footer: picoruby/mrbgems/picoruby-mbedtls/src/digest.c
+-->
+
 ----
 
 ```c
@@ -391,6 +395,10 @@ c_mbedtls_digest_update(mrbc_vm *vm, mrbc_value *v, int argc)
   SET_RETURN(*v);
 }
 ```
+
+<!--
+  _footer: picoruby/mrbgems/picoruby-mbedtls/src/digest.c
+-->
 
 <!--
 We first take the wrapped context from the instance, then pass it to Mbed TLS's functions.
@@ -457,6 +465,10 @@ uint8_t c_rng_random_byte_impl(void)
 ```
 
 <!--
+  _footer: picoruby/mrbgems/picoruby-rng/ports/rp2040/rng.c
+-->
+
+<!--
 We use a technique called "von Neumann whitening",
 where we turn the ups and downs of the sequence into 1s and 0s,
 instead of using the 0s and 1s directly from the output.
@@ -475,37 +487,180 @@ This decreases the bias of the output.
 
 ----
 
-(overview)
+# What do we mean by Networking?
 
-- General overview of what was missing
-- What do we mean by Networking here
-  - WiFi, TCP/IP
-- Debugging Networking
-  - Use RasPi 5 as a WiFi router
-  - Wireshark
-- misc
-  - mruby/c's String's actual C representation is guaranteed to be null-terminated https://github.com/mrubyc/mrubyc/blob/master/src/c_string.c#L71-L103
+The goal was to:
+
+- Connect to WiFi with 802.11(L2)
+- And get an IP(L3) address
+- And speak to servers with TCP (L4)
+- Maybe encrypt it with TLS (L5)
+- With HTTP as application layer (L6/7)
 
 ----
 
-- Connect to WiFi AP with CYW43
-- Introduction to lwIP
-- DNS
-  - actually this was easy
-- TCP Client
-  - Application Layered TCP
+# What was missing?
+
+- Hardware driver
+  - CYW43439's driver is included in Pico SDK
+- TCP/IP, TLS
+  - Provided by lwIP and Mbed TLS
+- HTTP
+  - None
+- Interface to Ruby
+  - None except HW driver
+
+![bg right:40% fit](images/pyramid-chart.png)
+
+----
+
+# What was missing?
+
+- CYW43439 driver speaks with lwIP to provide IP setup
+- lwIP speaks with Mbed TLS to provide TLS over TCP
+- ... so it mostly came down to:
+  - Writing interfaces to PicoRuby
+  - Implementing basic HTTP
+
+![bg right:40% fit](images/pyramid-chart.png)
+
+----
+
+# Add libraries in R2P2
+
+In `CMakeLists.txt`:
+
+```cmake
+if(DEFINED ENV{PICO_W})
+  target_link_libraries(${PROJECT_NAME} PRIVATE
+    pico_btstack_ble
+    pico_btstack_cyw43
+    pico_cyw43_arch_lwip_threadsafe_background # ADDED
+    pico_lwip_mbedtls # ADDED
+    pico_mbedtls # ADDED
+  )
+  target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_SOURCE_DIR}/lib/picoruby/mrbgems/picoruby-ble/include
+  )
+endif()
+```
+
+<!--
+  _footer: R2P2/CMakeLists.txt
+-->
+
+----
+
+# Driver operation modes
+
+(TBD) talk about `pico_cyw43_arch_lwip_threadsafe_background` vs `pico_cyw43_arch_lwip_poll`
+
+----
+
+# CYW43439 driver
+
+- `cyw43_arch_init_with_country()`
+  - Initialization, limits frequencies of radio waves
+- `cyw43_arch_enable_sta_mode()`
+  - Operates in Station (client) Mode
+- `cyw43_arch_wifi_connect_blocking()`
+  - Connect to WiFi AP, blocks until success/failure
+  - There are non-blocking modes but this is mostly enough
+
+----
+
+# CYW43439 driver
+
+```ruby
+CYW43.init('JP')
+CYW43.enable_sta_mode
+CYW43.connect_blocking(
+  'SSID_of_AP', 'password',
+  CYW43::Auth::WPA2_MIXED_PSK
+)
+```
+
+----
+
+# DNS
+
+- Actually this was easier than TCP
+- Handled by lwIP, uses UDP
+- `dns_gethostbyname()` takes a callback function when record is found
+  - most of the rest of lwIP functions operate like this too
+
+----
+
+```c
+void dns_found(const char *name, const ip_addr_t *ip, void *arg)
+{
+  ip_addr_t *result = (ip_addr_t *)arg;
+  if (ip) {
+    ip4_addr_copy(*result, *ip);
+  } else {
+    ip4_addr_set_loopback(result);
+  }
+  return;
+}
+
+err_t get_ip_impl(const char *name, ip_addr_t *ip)
+{
+  cyw43_arch_lwip_begin();
+  err_t err = dns_gethostbyname(name, ip, dns_found, ip);
+  cyw43_arch_lwip_end();
+  return err;
+}
+```
+
+<!--
+  _footer: picoruby/mrbgems/picoruby-net/ports/rp2040/net.c
+-->
+
+----
+
+# Aside: Debugging Networking
+
+- Set up a hotspot with Raspberry Pi
+  - [There is an official tutorial](https://www.raspberrypi.com/tutorials/host-a-hotel-wifi-hotspot/)
+  - You can do it with builtin WiFi and a wired connection
+  - I got a WiFi dongle and connected to home AP with builtin WiFi
+- Look inside packets with Wireshark
+
+![bg right:33%](images/PXL_20240503_110539070.jpg)
+
+----
+
+![bg fit](images/pcapng.png)
+
+<!--
+  I was able to fix the problem that I got in the demo video.
+  It was because the ip_addr_t was not properly zero-ed out.
+-->
+
+----
+
+# TCP
+
+- Application Layered TCP
+- mruby/c's String's actual C representation is guaranteed to be null-terminated https://github.com/mrubyc/mrubyc/blob/master/src/c_string.c#L71-L103
+
+----
+
+# HTTP
+
 - If you have TCP Client then Basic HTTP is easy
 
 ----
 
-- TLS
-  - with lwIP and ALTCP TLS is pretty trivial
-  - Implementation quirks
-    - you cannot call `malloc()` and `free()`
-      - They are libc functions. If you do it hangs up
-      - `mrbc_raw_alloc`, also lwIP has its own memory management
-    - OOM
-      - to enable TLS I had to reduce R2P2's heap memory significantly
+# TLS
+
+- with lwIP and ALTCP TLS is pretty trivial
+- Implementation quirks
+  - you cannot call `malloc()` and `free()`
+    - They are libc functions. If you do it hangs up
+    - `mrbc_raw_alloc`, also lwIP has its own memory management
+  - OOM
+    - to enable TLS I had to reduce R2P2's heap memory significantly
 
 ----
 
