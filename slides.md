@@ -846,25 +846,33 @@ I lost 3 hours from an erratic behavior by calling `free()`.
 
 ----
 
-# How it's done in Desktop Ruby
+# Sockets
 
-- Sockets
+- In Desktop Ruby we use `TCPSocket`
+  - BSD Socket API is standardized and widely used
+- lwIP's Socket API requires the use of an RTOS
+- But MicroPython has a Socket-esque API
+  - Maybe porting it?
 
-----
-
-# MicroPython's networking
-
-- Sockets-esque API
+<!--
+  I was first going to port MicroPython's network module, but it was too much work
+-->
 
 ----
 
 # Servers?
 
-- I decided against it
+- Obvious next step is this
+- I decided against it this time
+- Even if done, it will be in very limited capability
 
 ----
 
 # Blocking vs Non-Blocking
+
+- Even though it uses a background process for WiFi driver handling, the TCP client uses blocking IO
+- Is PicoRuby even capable of multi-processing/multi-threading?
+  - Raspberry Pi Pico is multi-core, but some hardware aren't even multi-core
 
 ----
 
