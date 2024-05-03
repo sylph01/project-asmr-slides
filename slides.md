@@ -670,17 +670,29 @@ err_t get_ip_impl(const char *name, ip_addr_t *ip)
 
 # Part 3:
 
-# Fleshing Out Networking
+# Possible Future Work
 
 ----
 
-(overview)
+# How it's done in Desktop Ruby
 
-- Look & Feel of the API
-- Blocking vs Non-Blocking
-- Porting of MicroPython's Networking
-  - details
-  - Sockets?
+- Sockets
+
+----
+
+# MicroPython's networking
+
+- Sockets-esque API
+
+----
+
+# Servers?
+
+- I decided against it
+
+----
+
+# Blocking vs Non-Blocking
 
 ----
 
