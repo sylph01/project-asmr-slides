@@ -553,7 +553,18 @@ endif()
 
 # Driver operation modes
 
-(TBD) talk about `pico_cyw43_arch_lwip_threadsafe_background` vs `pico_cyw43_arch_lwip_poll`
+The `cyw43_driver` and lwIP require periodic servicing, and these are handled in two different modes:
+
+- `pico_cyw43_arch_lwip_poll`
+  - The program polls the WiFi driver periodically to call callbacks and move data
+- `pico_cyw43_arch_lwip_threadsafe_background` **(used here)**
+  - Handling of the WiFi driver and TCP/IP stack is handled in the background, and is multi-core/thread/task safe.
+
+<!--
+  https://www.raspberrypi.com/documentation/pico-sdk/networking.html#rpip31c6d1db4dbbdd810379
+
+  There is an option to use FreeRTOS, but it's overkill to use it just for WiFi
+-->
 
 ----
 
@@ -639,28 +650,189 @@ err_t get_ip_impl(const char *name, ip_addr_t *ip)
 
 ----
 
-# TCP
+# TCP (Client-side)
 
-- Application Layered TCP
-- mruby/c's String's actual C representation is guaranteed to be null-terminated https://github.com/mrubyc/mrubyc/blob/master/src/c_string.c#L71-L103
+Basically we do the following:
+
+- Create a Protocol Control Block (PCB)
+- Set callbacks for `recv`, `sent`, `err`, `poll`
+  - `recv`: Handles received data. Most relevant 
+  - `sent`: Handles data sent. Does nothing
+  - `err`: Handle error cases. Almost does nothing
+  - `poll`: Mostly handles idle connections
+
+----
+
+```c
+tcp_connection_state *TCPClient_new_connection(
+  mrbc_value *send_data, mrbc_value *recv_data, mrbc_vm *vm)
+{
+  tcp_connection_state *cs = 
+    (tcp_connection_state *)mrbc_raw_alloc(sizeof(tcp_connection_state));
+  cs->state = NET_TCP_STATE_NONE;
+  cs->pcb = altcp_new(NULL);
+  altcp_recv(cs->pcb, TCPClient_recv_cb);
+  altcp_sent(cs->pcb, TCPClient_sent_cb);
+  altcp_err(cs->pcb, TCPClient_err_cb);
+  altcp_poll(cs->pcb, TCPClient_poll_cb, 10);
+  altcp_arg(cs->pcb, cs);
+  cs->send_data = send_data;
+  cs->recv_data = recv_data;
+  cs->vm        = vm;
+  return cs;
+}
+```
+<!--
+  _footer: picoruby/mrbgems/picoruby-net/ports/rp2040/net.c
+-->
+
+<!--
+  This is the code that I explained in the last slide.
+  In the tcp_connection state we hold the pointer to two buffers, the data that we are sending, and the data that we will receive, and the VM.
+  The VM pointer will be used to call `mrbc_free`.
+-->
+
+----
+
+```c
+err_t TCPClient_recv_cb(void *arg, struct altcp_pcb *pcb, struct pbuf *pbuf, err_t err)
+{
+  tcp_connection_state *cs = (tcp_connection_state *)arg;
+  if (pbuf != NULL) {
+    char *tmpbuf = mrbc_alloc(cs->vm, pbuf->tot_len + 1);
+    struct pbuf *current_pbuf = pbuf;
+    int offset = 0;
+    while (current_pbuf != NULL) {
+      pbuf_copy_partial(current_pbuf, tmpbuf + offset, current_pbuf->len, 0);
+      offset += current_pbuf->len;
+      current_pbuf = current_pbuf->next;
+    }
+    tmpbuf[pbuf->tot_len] = '\0';
+    mrbc_string_append_cbuf(cs->recv_data, tmpbuf, pbuf->tot_len);
+    mrbc_free(cs->vm, tmpbuf);
+    altcp_recved(pcb, pbuf->tot_len);
+    cs->state = NET_TCP_STATE_PACKET_RECVED;
+    pbuf_free(pbuf);
+  } else {
+    cs->state = NET_TCP_STATE_FINISHED;
+  }
+  return ERR_OK;
+}
+```
+
+<!--
+  _footer: picoruby/mrbgems/picoruby-net/ports/rp2040/net.c
+-->
+
+<!--
+  This is the recv callback.
+  We get the packets in a struct called pbuf, and we will extract the contents of those packets into the receive buffer.
+-->
+
+----
+
+```c
+mrbc_value TCPClient_send(const char *host, int port, mrbc_vm *vm, mrbc_value *send_data, bool is_tls)
+{
+  ip_addr_t ip;
+  mrbc_value ret;
+  get_ip(host, &ip);
+  if(!ip4_addr_isloopback(&ip)) {
+    char ip_str[16];
+    ipaddr_ntoa_r(&ip, ip_str, 16);
+    mrbc_value recv_data = mrbc_string_new(vm, NULL, 0);
+    tcp_connection_state *cs = TCPClient_connect_impl(&ip, host, port, send_data, &recv_data, vm, is_tls);
+    while(TCPClient_poll_impl(&cs))
+    {
+      sleep_ms(200);
+    }
+    // recv_data is ready after connection is complete
+    ret = recv_data;
+  } else {
+    ret = mrbc_nil_value();
+  }
+  return ret;
+}
+```
+
+<!--
+  _footer: picoruby/mrbgems/picoruby-net/ports/rp2040/net.c
+-->
+
+<!--
+  And this is the main function for sending data over TCP.
+  When the connection is complete or encounters an error, TCPClient_poll_impl will return 0,
+  and we can continue by returning the received data.
+-->
 
 ----
 
 # HTTP
 
-- If you have TCP Client then Basic HTTP is easy
+```ruby
+  class HTTPClient
+    def initialize(host)
+      @host = host
+    end
+
+    def get(path)
+      req =  "GET #{path} HTTP/1.1\r\n"
+      req += "Host:#{@host}\r\n"
+      req += "Connection: close\r\n"
+      req += "\r\n"
+
+      TCPClient.request(@host, 80, req, false)
+    end
+  end
+```
+
+<!--
+  _footer: picoruby/mrbgems/picoruby-net/mrblib/net.rb @ e33a743f
+-->
+
+<!--
+  If you have TCP then basic HTTP is easy. This is an example of a basic HTTP GET.
+-->
 
 ----
 
 # TLS
 
-- with lwIP and ALTCP TLS is pretty trivial
-- Implementation quirks
-  - you cannot call `malloc()` and `free()`
-    - They are libc functions. If you do it hangs up
-    - `mrbc_raw_alloc`, also lwIP has its own memory management
-  - OOM
-    - to enable TLS I had to reduce R2P2's heap memory significantly
+- With lwIP and Application Layered TCP (ALTCP) getting TLS is pretty trivial
+  - instead of `altcp_new()` you will call `altcp_tls_new()`
+    - `altcp_tls_create_config_client()` to create TLS config
+    - use config to `altcp_tls_new()`
+    - `mbedtls_ssl_set_hostname()` to pass the host name to connect
+    - rest is the same!
+
+----
+
+# TLS with Application Layered TCP
+
+If the PCB is a TLS PCB:
+
+- When you send data, after TCP sending functions are called, TLS callbacks will be called to encrypt data
+- When you receive data, TLS callbacks will be called to decrypt data, then the TCP callbacks will be called
+
+----
+
+# Memory Management
+
+I said TLS was trivial but actually it was not *that* trivial.
+
+- lwIP has a separate memory management mechanism from the mruby/c VM (PicoRuby)
+- When I started implementing TLS it suddenly hung up: **OOM!**
+- I had to reduce PicoRuby's heap memory size from 194KB to **96KB**
+
+----
+
+# Memory Management
+
+Also, your ordinary `malloc()` / `free()` does not exist.
+
+They are either `mrbc_alloc()` / `mrbc_free()` that takes a VM, or the lwIP's variant.
+
+I lost 3 hours from an erratic behavior by calling `free()`.
 
 ----
 
