@@ -911,7 +911,7 @@ I lost 3 hours from an erratic behavior by calling `free()`.
     - DNS
     - TCPClient
     - HTTP(S)Client
-      - GET
+      - GET, POST, PUT
 
 ----
 
