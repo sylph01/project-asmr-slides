@@ -928,7 +928,7 @@ I lost 3 hours from an erratic behavior by calling `free()`.
 - Performance numbers from similar environments:
   - [STM32L562E Cortex-M33 at 110 MHz, wolfSSL](https://www.wolfssl.com/docs/stm32/)
     - RSA 2048 Signing: 9.208 ops/sec
-    - RSA 2048 Verfiication: **0.155 ops/sec**
+    - RSA 2048 Verification: **0.155 ops/sec**
     - ECDHE 256 Key agreement: **0.661 ops/sec**
 
 ----
