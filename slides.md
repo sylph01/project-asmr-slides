@@ -77,7 +77,14 @@ that is more relevant to this talk:
 ----
 
 # Why not implement cryptography into **microcontrollers**?
-# Maybe we can get **TLS** too?
+
+----
+
+<!-- _class: titlepage_white -->
+
+# Can we haz **TLS** in PicoRuby?
+
+![bg brightness:0.6](images/P_20181024_180120.jpg)
 
 ----
 
