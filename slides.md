@@ -821,6 +821,8 @@ If the PCB is a TLS PCB:
 - When you send data, after TCP sending functions are called, TLS callbacks will be called to encrypt data
 - When you receive data, TLS callbacks will be called to decrypt data, then the TCP callbacks will be called
 
+As such, cryptography implemented in Part 1 is not used here; it will be used to perform application-level cryptographic operations.
+
 ----
 
 # Memory Management
