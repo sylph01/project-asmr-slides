@@ -1006,6 +1006,8 @@ Runs a Linux, can SSH into it, can run a GUI, has enough power to run asymmetric
 
 <!--
   The community is waiting for your contribution!
+
+  Note: This picture was taken in 2005 at the very end of Se-fa Utaki. This exact location that I took this picture is now unaccessible to visitors.
 -->
 
 ----
