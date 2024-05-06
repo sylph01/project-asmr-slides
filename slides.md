@@ -941,6 +941,8 @@ Also, without a trust store, we will get **encryption** through TLS, but we will
 
 For these reasons, depending on your security needs, it would be enough to **just use symmetric crypto** between the gateway and use TLS from there.
 
+Note that your WiFi password exists in your Pico to connect!
+
 <!--
   In this case, the gateway has a trust store (trusted certificate list) and thus will be capable of authentication.
 
