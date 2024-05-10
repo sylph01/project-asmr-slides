@@ -109,12 +109,12 @@ that is more relevant to this talk:
 
 ----
 
-# Target environment
+# Target environment: PicoRuby + R2P2
 
-- (all of the following is done by @hasumikin -san)
-- PicoRuby + R2P2
-  - https://github.com/picoruby/picoruby : Ruby implementation
-  - https://github.com/picoruby/R2P2 : Shell system for Pi Pico (W)
+(All of the following is done by @hasumikin)
+
+- https://github.com/picoruby/picoruby : Ruby implementation
+- https://github.com/picoruby/R2P2 : Shell system for Pi Pico (W)
 - Well-known usage: "PRK Firmware: Keyboard is Essentially Ruby" (RubyKaigi 2021 Takeout) https://www.youtube.com/watch?v=5unMW_BAd4A
 
 ----
@@ -232,7 +232,9 @@ require 'openssl'
 digest = OpenSSL::Digest.new('sha256')
 digest.update('The magic words are ')
 digest.update('squeamish ossifrage.')
+digest.hexdigest
 
+# oneshot API
 OpenSSL::Digest::SHA256.hexdigest(
   'The magic words are squeamish ossifrage.'
 )
@@ -476,8 +478,8 @@ uint8_t c_rng_random_byte_impl(void)
 -->
 
 <!--
-We use a technique called "von Neumann whitening",
-where we turn the ups and downs of the sequence into 1s and 0s,
+We use a technique called "von Neumann whitening/debiasing",
+where we turn 10s into a 1, 01s into a 0, and discard 00s and 11s,
 instead of using the 0s and 1s directly from the output.
 This decreases the bias of the output. 
 -->
@@ -664,8 +666,8 @@ Basically we do the following:
 - Create a Protocol Control Block (PCB)
 - Set callbacks for `recv`, `sent`, `err`, `poll`
   - `recv`: Handles received data. Most relevant 
-  - `sent`: Handles data sent. Does nothing
-  - `err`: Handle error cases. Almost does nothing
+  - `sent`: Handles data sent. Does nothing here
+  - `err`: Handle error cases. Almost does nothing here
   - `poll`: Mostly handles idle connections
 
 ----
@@ -821,13 +823,17 @@ If the PCB is a TLS PCB:
 - When you send data, after TCP sending functions are called, TLS callbacks will be called to encrypt data
 - When you receive data, TLS callbacks will be called to decrypt data, then the TCP callbacks will be called
 
-As such, cryptography implemented in Part 1 is not used here; it will be used to perform application-level cryptographic operations.
+As such, cryptography implemented in Part 1 is not used here.
+
+<!--
+Cryptography implemented in Part 1 will be used to perform application-level cryptographic operations.
+-->
 
 ----
 
 # Memory Management
 
-I said TLS was trivial but actually it was not *that* trivial.
+Actually TLS was not *that* trivial...
 
 - lwIP has a separate memory management mechanism from the mruby/c VM (PicoRuby)
 - When I started implementing TLS it suddenly hung up: **OOM!**
@@ -837,7 +843,7 @@ I said TLS was trivial but actually it was not *that* trivial.
 
 # Memory Management
 
-Also, your ordinary `malloc()` / `free()` does not exist.
+Your ordinary `malloc()` / `free()` does not exist.
 
 They are either `mrbc_alloc()` / `mrbc_free()` that takes a VM, or the lwIP's variant.
 
@@ -911,7 +917,7 @@ I lost 3 hours from an erratic behavior by calling `free()`.
 
 ----
 
-# Stuff delivered (cont)
+# Stuff delivered (cont'd)
 
 - Experimental
   - CYW43
@@ -921,6 +927,15 @@ I lost 3 hours from an erratic behavior by calling `free()`.
     - TCPClient
     - HTTP(S)Client
       - GET, POST, PUT
+
+----
+
+# What's left before merge?
+
+- Rename C functions consistently
+  - We don't have namespaces!
+- Error handling
+- And...?
 
 ----
 
@@ -944,6 +959,8 @@ For these reasons, depending on your security needs, it would be enough to **jus
 Note that your WiFi password exists in your Pico to connect!
 
 <!--
+  That's why I added the option for application level encryption.
+
   In this case, the gateway has a trust store (trusted certificate list) and thus will be capable of authentication.
 
   Note: In this case you have to provision your devices with a fixed symmetric key. Physical compromise of the device is possible. But do you even care about that in most cases?
