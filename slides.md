@@ -88,6 +88,16 @@ that is more relevant to this talk:
 
 ----
 
+# Target environment: PicoRuby + R2P2
+
+(All of the following is done by @hasumikin)
+
+- https://github.com/picoruby/picoruby : Ruby implementation
+- https://github.com/picoruby/R2P2 : Shell system for Pi Pico (W)
+- Well-known usage: "PRK Firmware: Keyboard is Essentially Ruby" (RubyKaigi 2021 Takeout) https://www.youtube.com/watch?v=5unMW_BAd4A
+
+----
+
 # Raspberry Pi Pico W
 
 - Board with RP2040 microcontroller
@@ -106,16 +116,6 @@ that is more relevant to this talk:
 
   btw the size of SRAM becomes important later
 -->
-
-----
-
-# Target environment: PicoRuby + R2P2
-
-(All of the following is done by @hasumikin)
-
-- https://github.com/picoruby/picoruby : Ruby implementation
-- https://github.com/picoruby/R2P2 : Shell system for Pi Pico (W)
-- Well-known usage: "PRK Firmware: Keyboard is Essentially Ruby" (RubyKaigi 2021 Takeout) https://www.youtube.com/watch?v=5unMW_BAd4A
 
 ----
 
