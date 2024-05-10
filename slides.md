@@ -851,6 +851,18 @@ I lost 3 hours from an erratic behavior by calling `free()`.
 
 ----
 
+# Note: This is NOT the full story
+
+I skipped over many things for brevity, such as (but not limited to):
+
+- Hardware driver's "periodic servicing" part
+  - How to read data and load it onto memory, and such
+- TCP handshake, TLS handshake
+- Sending/Receiving large chunks of data
+  - Short story: **Don't do it.**
+
+----
+
 ----
 
 <!-- _class: titlepage -->
@@ -878,8 +890,8 @@ I lost 3 hours from an erratic behavior by calling `free()`.
 # Servers?
 
 - Obvious next step is this
-- I decided against it this time
-- Even if done, it will be in very limited capability
+- This is easier to do with Socket-esque API
+- It will be in very limited capability
 
 ----
 
