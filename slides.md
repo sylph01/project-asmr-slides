@@ -11,6 +11,12 @@ theme: argent
 ## Ryo Kajiwara/梶原 龍 (sylph01)
 ### 2024/5/16 @ RubyKaigi 2024
 
+<!--
+  Hi, I'm Ryo, I go by sylph01 on the Internet, and I will be talking about:
+  (whisper) Adding Security to Microcontroller Ruby...
+  okay, jokes aside, (next)
+-->
+
 ---
 
 # Slides are available at:
@@ -18,6 +24,11 @@ theme: argent
 ## https://speakerdeck.com/sylph01/adding-security-to-microcontroller-ruby
 
 ![bg right](images/frame.png)
+
+<!--
+  There is lots of text so that people can read later.
+  I recommend you to open the slides and follow along. Don't worry, I'm not that kind of security guy that traps you into loading malware.
+-->
 
 ---
 
@@ -960,6 +971,10 @@ I skipped over many things for brevity, such as (but not limited to):
     - RSA 2048 Verification: **0.155 ops/sec**
     - ECDHE 256 Key agreement: **0.661 ops/sec**
 
+<!--
+  0.155 ops/sec means It takes 6.4 seconds to verify RSA 2048 signatures. That's too slow, our connection will time out!
+-->
+
 ----
 
 # But do we **really** need TLS?
@@ -971,9 +986,7 @@ For these reasons, depending on your security needs, it would be enough to **jus
 Note that your WiFi password exists in your Pico to connect!
 
 <!--
-  That's why I added the option for application level encryption.
-
-  In this case, the gateway has a trust store (trusted certificate list) and thus will be capable of authentication.
+  In this case, the gateway has a trust store (trusted certificate list) and thus will be capable of authentication. And also that's why I added the option for application level encryption.
 
   Note: In this case you have to provision your devices with a fixed symmetric key. Physical compromise of the device is possible. But do you even care about that in most cases?
 -->
@@ -985,6 +998,10 @@ Note that your WiFi password exists in your Pico to connect!
 Runs a Linux, can SSH into it, can run a GUI, has enough power to run asymmetric crypto
 
 ![bg right:35%](images/PXL_20240424_142957171.jpg)
+
+<!--
+  Heck, you don't even have to run mruby, you can just run Desktop Ruby!
+-->
 
 ----
 
