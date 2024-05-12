@@ -904,6 +904,11 @@ I skipped over many things for brevity, such as (but not limited to):
 - This is easier to do with Socket-esque API
 - It will be in very limited capability
 
+<!--
+  This is actually in the works right now with the current API.
+  I have to come up with an API design that will allow Ruby code to build responses.
+-->
+
 ----
 
 # Blocking vs Non-Blocking
