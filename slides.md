@@ -98,6 +98,10 @@ that is more relevant to this talk:
 
 # Why not implement cryptography into **microcontrollers**?
 
+<!--
+Having experience with C extensions and crypto libraries, I came up with a question: 
+-->
+
 ----
 
 <!-- _class: titlepage_white -->
