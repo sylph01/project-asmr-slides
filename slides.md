@@ -12,9 +12,9 @@ theme: argent
 ### 2024/5/16 @ RubyKaigi 2024
 
 <!--
-  Hi, I'm Ryo, I go by sylph01 on the Internet, and I will be talking about:
+  Hi, today I will be talking about:
   (whisper) Adding Security to Microcontroller Ruby...
-  okay, jokes aside, (next)
+  okay, jokes aside, I'm Ryo, I go by sylph01 on the Internet.
 -->
 
 ---
@@ -60,6 +60,10 @@ if anything catches your interest let's talk!
 
 ![bg brightness:0.5](images/keebs.png)
 
+<!--
+  時間的にmixinの話cutでもいいかも
+-->
+
 ---
 
 <!-- _class: titlepage -->
@@ -72,6 +76,11 @@ that is more relevant to this talk:
 - Worked/ing on writing/editing and implementing standards
   - HTTPS in Local Network CG / Web of Things WG @ W3C, OAuth / Messaging Layer Security WG @ IETF
 - Worked as an Officer of Internet Society Japan Chapter (2020-23)
+
+<!--
+  ISOCの部分カット
+  I've been working/worked on writing, editing, and implementing standards in W3C and the IETF.
+-->
 
 ----
 
@@ -208,7 +217,7 @@ If you want to see it in person, come find me any time during the Kaigi!
   - Everything else (esp. stuff that touches networking hardware) should be considered experimental
 
 <!--
-  here's the obligatory warning
+  here's the obligatory warning when talking about security
 -->
 
 ----
@@ -301,6 +310,12 @@ plain += decipher.final
 - What's Base16? It's `Array#pack` with `H*`
 - I added this first so that debugging cryptography is easier
 
+<!--
+  When developing cryptography, you want to be able to read binary data, so we use Base16 or Base64 encoding. But PicoRuby didn't have them. Why? Because it's for humans, not for machines! We don't have enough space for human friendliness in the Embedded world.
+
+  The Base16/64 mrbgem is a simple example if you want to get into mrbgem development.
+-->
+
 ----
 
 # AES in PicoRuby + Mbed TLS
@@ -356,6 +371,14 @@ Base16.encode16 s
     `mrbc_instance_new(vm, v->cls, sizeof(C_VAL_TO_WRAP))`
   - Here, we want to wrap the "context" struct created by OpenSSL or mbed TLS
 
+<!--
+  When writing a C library wrapper, you want to wrap the library's context value, the value in C, into a Ruby object, so that we can keep track of the context.
+
+  In CRuby, it is done by ...
+
+  And in mruby/c, it's done a little bit differently.
+-->
+
 ----
 
 # mruby/c vs CRuby
@@ -394,6 +417,16 @@ c_mbedtls_digest__init_ctx(mrbc_vm *vm, mrbc_value *v, int argc)
 ```
 
 <!--
+  This is what the initialization of the Digest instance looks like.
+  We get the algorithm ID with GET_ARG(1),
+  we instantiate the Digest object with a buffer size of `mbedtls_md_context_t`,
+  take the pointer to the buffer,
+  then call `mbedtls_md_init` to create a context there.
+
+  Then we call some more functions to set up the context.
+-->
+
+<!--
   _footer: picoruby/mrbgems/picoruby-mbedtls/src/digest.c
 -->
 
@@ -421,9 +454,11 @@ c_mbedtls_digest_update(mrbc_vm *vm, mrbc_value *v, int argc)
 -->
 
 <!--
+This is what the update function looks like.
+
 We first take the wrapped context from the instance, then pass it to Mbed TLS's functions.
 
-When you define an instance method, you want to call `mrbc_incref` to prevent the object from being GCed.
+When you define an instance method, you want to call `mrbc_incref` to prevent the object from being GCed. Without this, if you call instance.update the next time, the object will be deallocated at that point, so it will result in a segfault.
 -->
 
 ----
@@ -449,18 +484,20 @@ You can of course write wrappers though.
   - We use the **Ring Oscillator (ROSC)** to extract random bits
   - You can use this through the `RNG` gem
 
+<!--
+  Maybe not here, but using fixed nonces/IVs are a bad idea. It reduces security significantly. For example, the PS3's code signing key leaked because of a re-used ECDSA nonce.
+-->
+
 ----
 
 ![bg fit](images/Screenshot_20240503_074915.png)
 
 <!--
-https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf
+  _footer: https://datasheets.raspberrypi.com/rp2040/rp2040-datasheet.pdf, 2.17.5. Random Number Generator
+-->
 
-2.17.5. Random Number Generator
-
-This does not meet the requirements of randomness for security systems because it can be compromised,
-but it may be useful in less critical applications. If the cores are running from the ROSC then the value will not be
-random because the timing of the register read will be correlated to the phase of the ROSC.
+<!--
+  The Ring Oscillator is a chain of NOT gates that flip with the clock, so depending on the timing to access the ROSC, you will randomly get a 0 or a 1.
 -->
 
 ----
@@ -489,10 +526,9 @@ uint8_t c_rng_random_byte_impl(void)
 -->
 
 <!--
-We use a technique called "von Neumann whitening/debiasing",
+Here we are getting the random bit from the hardware with rosc_hw arrow randombit. The randomness produced by the hardware may have some bias, so using that directly would be "Bad RNG". So to get "Good RNG", here we are using a technique called "von Neumann whitening/debiasing",
 where we turn 10s into a 1, 01s into a 0, and discard 00s and 11s,
 instead of using the 0s and 1s directly from the output.
-This decreases the bias of the output. 
 -->
 
 ----
@@ -504,6 +540,10 @@ This decreases the bias of the output.
 # Part 2:
 
 # Networking
+
+<!--
+  ここで15分くらい目指したい
+-->
 
 ----
 
@@ -963,7 +1003,11 @@ I skipped over many things for brevity, such as (but not limited to):
 - Rename C functions consistently
   - We don't have namespaces!
 - Error handling
-- And...?
+- Toggle Networking with a build flag
+
+<!--
+  Networking takes up a significant part of the RAM so we want to toggle it out if we don't need them
+-->
 
 ----
 
@@ -977,7 +1021,7 @@ I skipped over many things for brevity, such as (but not limited to):
     - ECDHE 256 Key agreement: **0.661 ops/sec**
 
 <!--
-  0.155 ops/sec means It takes 6.4 seconds to verify RSA 2048 signatures. That's too slow, our connection will time out!
+  It takes 6.4 seconds to verify RSA 2048 signatures on similar hardware. That's too slow, our connection will time out!
 -->
 
 ----
@@ -991,9 +1035,7 @@ For these reasons, depending on your security needs, it would be enough to **jus
 Note that your WiFi password exists in your Pico to connect!
 
 <!--
-  In this case, the gateway has a trust store (trusted certificate list) and thus will be capable of authentication. And also that's why I added the option for application level encryption.
-
-  Note: In this case you have to provision your devices with a fixed symmetric key. Physical compromise of the device is possible. But do you even care about that in most cases?
+Physical compromise of the device is possible. But do you even care about that in most cases?
 -->
 
 ----
@@ -1083,6 +1125,10 @@ Runs a Linux, can SSH into it, can run a GUI, has enough power to run asymmetric
 
 And to the organizers of RubyKaigi 2024!
 
+<!--
+  Please stand up if you're here, and give them a round of applause, they're awesome
+-->
+
 ---
 
 # More Shoutouts
@@ -1096,6 +1142,10 @@ Sponsors of RubyKaigi, esp:
 
 
 ![bg right:25%](images/sponsors.png)
+
+<!--
+  Some more shoutouts to the sponsors I have personal connections with. They are cool, go take a look at them!
+-->
 
 ----
 
