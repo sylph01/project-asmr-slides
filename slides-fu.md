@@ -210,3 +210,26 @@ security featureが増えたということで **本当の意味でAdding Securi
 - ruby/opensslにpull requestする
   - 止まってるのが「OpenSSLにHPKEがないバージョンで無効化する/テストも除外する」という部分
 - 特にタイムリミット決めてはないけど年内あたりに入るといいなあ
+
+----
+
+
+----
+
+# Part 3:
+# 始めてすらいない話
+
+----
+
+# **ブラウザRuby**アツいけど
+# **暗号**できんの？
+
+----
+
+# 大統一暗号API？
+
+- 「普段のRuby」はだいたいOpenSSL使ってる
+- PicoRubyほか組み込み向けRubyの場合はMbed TLS
+- ブラウザはWebCrypto API経由で使う
+- これらのAPI wrapperを作ると全環境向けのgemが書けるのでは？
+- まだ考えてるだけなのでフィードバックほしい
