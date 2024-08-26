@@ -131,6 +131,11 @@ typedef enum {
 } mbedtls_md_type_t;
 ```
 
+<!--
+  SHA-1ですら避けたくて、MD5ですら現代で使うべきでない。
+  MD2? MD4? もっと使うべきでない。
+-->
+
 ----
 
 # Mbed TLS 3系での定義
