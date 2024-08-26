@@ -50,6 +50,9 @@ RubyKaigiではPicoRubyのWiFiの実装の話をしました。
 - いい加減pull requestを出しました
   - [picoruby/picoruby#174](https://github.com/picoruby/picoruby/pull/174)
   - [picoruby/R2P2#12](https://github.com/picoruby/R2P2/pull/12)
+- update 8/26: 入りました :tada:
+  - [picoruby/picoruby @ 2a229de](https://github.com/picoruby/picoruby/commit/2a229de5cda8ea01a3efcee4d4cb27928e6a6830)
+  - [picoruby/R2P2 @ 8744982](https://github.com/picoruby/R2P2/commit/8744982eda9c462c04d2f6328ee6091ae8451f8d)
 - 割と巨大なpull requestですが実質的にはほぼRubyKaigiの発表通り
 
 ----
