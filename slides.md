@@ -12,9 +12,9 @@ theme: argent
 ### 2024/5/16 @ RubyKaigi 2024
 
 <!--
-  Hi, today I will be talking about:
+  Hi, I'm Ryo Kajiwara, I go by sylph01 on the Internet, and today I will be talking about:
   (whisper) Adding Security to Microcontroller Ruby...
-  okay, jokes aside, I'm Ryo, I go by sylph01 on the Internet.
+  get it? okay.
 -->
 
 ---
@@ -26,7 +26,7 @@ theme: argent
 ![bg right](images/frame.png)
 
 <!--
-  There is lots of text so that people can read later.
+  There are lots of text so that people can read later.
   I recommend you to open the slides and follow along. Don't worry, I'm not that kind of security guy that traps you into loading malware.
 -->
 
@@ -99,7 +99,7 @@ that is more relevant to this talk:
 # Why not implement cryptography into **microcontrollers**?
 
 <!--
-Having experience with C extensions and crypto libraries, I came up with a question: 
+AFter gaining some experience with C extensions and crypto libraries, I came up with a question: 
 -->
 
 ----
@@ -462,7 +462,7 @@ This is what the update function looks like.
 
 We first take the wrapped context from the instance, then pass it to Mbed TLS's functions.
 
-When you define an instance method, you want to call `mrbc_incref` to prevent the object from being GCed. Without this, if you call instance.update the next time, the object will be deallocated at that point, so it will result in a segfault.
+When you define an instance method, you want to call `mrbc_incref` to prevent the object from being deallocated. Without this, if you call instance.update the next time, the object will be deallocated at that point, so it will result in a segfault.
 -->
 
 ----
@@ -472,6 +472,8 @@ When you define an instance method, you want to call `mrbc_incref` to prevent th
 In a memory-constrained environment, it's better to have multiple-call APIs instead of one-shot APIs, because to use the one-shot API, you need twice the memory of the original string.
 
 <!--
+Note that we only implemented APIs with updates and finishes, instead of the API that encrypts the whole buffer, or the one-shot APIs.
+
 With multiple-call APIs, we can process partially encrypted strings (send them) then free that buffer to continue with the rest.
 
 You can of course write wrappers though.
@@ -489,7 +491,7 @@ You can of course write wrappers though.
   - You can use this through the `RNG` gem
 
 <!--
-  Maybe not here, but using fixed nonces/IVs are a bad idea. It reduces security significantly. For example, the PS3's code signing key leaked because of a re-used ECDSA nonce.
+  When doing cryptography, using fixed nonces/IVs are a bad idea. It reduces security significantly. For example, the PS3's code signing key leaked because of a re-used ECDSA nonce.
 -->
 
 ----
@@ -709,7 +711,11 @@ err_t get_ip_impl(const char *name, ip_addr_t *ip)
 
 <!--
   I was able to fix the problem that I got in the demo video.
-  It was because the ip_addr_t was not properly zero-ed out.
+
+  In the top is the capture from the demo. It is somehow trying to connect to 3.0.0.0 before a DNS response.
+  It was failing because the ip_addr_t was not properly zero-ed out.
+
+  After properly zero-ing out the ip_addr_t, you can see that TCP connection is sent to the IP address obtained through DNS.
 -->
 
 ----
