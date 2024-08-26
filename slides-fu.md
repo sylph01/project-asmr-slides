@@ -17,6 +17,12 @@ theme: argent
 
 ![](images/Screenshot_20240826_070525.png)
 
+<!--
+やせいのプログラマ。暗号とか認証認可とかできます。
+RubyKaigiではPicoRubyのWiFiの実装の話をしました。
+今日の話はだいたいその両方の話をします。
+-->
+
 ----
 
 # おまけ: RubyKaigi 2025の話
@@ -65,6 +71,8 @@ theme: argent
 - Cコンパイラのプリプロセッサオプションを渡す: 以下の両方をする
   - `build_config` ファイル内の `conf.cc.defines` に追加
   - CMakeLists.txt の中で `add_definitions`
+
+<!-- mruby系のビルド周りけっこうundocumentedな気がする、もうちょっとわかったらまとめたい -->
 
 ----
 
