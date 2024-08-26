@@ -106,6 +106,14 @@ RubyKaigiではPicoRubyのWiFiの実装の話をしました。
 
 ----
 
+# Mbed TLSのバージョンの話
+
+- Pico SDKに入っているバージョンは2.28.1相当
+  - 実はpico-sdk 1.5.1の指しているsubmoduleのコミットはもっと中途半端な位置
+- `picoruby-mbedtls` mrbgemが指していたバージョンは3.4.1
+
+----
+
 # Mbed TLS 2系での定義
 
 ```c
@@ -155,7 +163,7 @@ typedef enum {
 
 # 直した
 
-- mrbgems側のMbed TLSのバージョンを2系にrevert
+- mrbgem側のMbed TLSのバージョンを2系にrevert
 - Mbed TLS 3系依存のコードを微修正
 - ビルドキャッシュに悩まされた
 
