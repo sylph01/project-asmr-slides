@@ -38,6 +38,16 @@ RubyKaigiではPicoRubyのWiFiの実装の話をしました。
 
 ----
 
+# さらにおまけ: 宣伝
+
+『n月刊ラムダノート』にて **「SMTP、どうしてこうなった」** という記事を寄稿しました。よろしくねよろしくね
+
+なお今日の発表とは全く関係がない。
+
+![bg right:35% fit](images/covre-with-titles_530x.webp)
+
+----
+
 ----
 
 # Part 1:
