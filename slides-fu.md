@@ -19,6 +19,7 @@ theme: argent
 
 <!--
 やせいのプログラマ。暗号とか認証認可とかできます。
+ネットワークとかもできるらしい。
 RubyKaigiではPicoRubyのWiFiの実装の話をしました。
 今日の話はだいたいその両方の話をします。
 -->
@@ -77,6 +78,10 @@ RubyKaigiではPicoRubyのWiFiの実装の話をしました。
   - `BOARD=pico_w` なら `WIFI` / `BLE` 両方オフはエラー
 - これによってWiFiを使わない場合はちゃんとRAMが194KB使える
 
+<!--
+  ビルド方法の速報版は https://s01.ninja/ja/picoruby-wifi-build.html にあります
+-->
+
 ----
 
 # 今後このへんやる人向けメモ
@@ -107,7 +112,10 @@ RubyKaigiではPicoRubyのWiFiの実装の話をしました。
   endif()
 ```
 
-<!-- WiFiとBLEのチップが同じなのでそのライブラリは入れてあげなきゃいけない。BLEだけならlwIPは要らないので pico_cyw43_arch_none -->
+<!--
+  cyw43って何？ -> WiFi/BLEチップのこと。cyw43-archはPico SDKが用意してるそれ用のデバイスドライバ。
+  WiFiとBLEのチップが同じなのでそのライブラリは入れてあげなきゃいけない。BLEだけならlwIPは要らないので pico_cyw43_arch_none
+-->
 
 ----
 
@@ -212,6 +220,11 @@ typedef enum {
 - SRAMが倍(520KB)になった
 
 **本当の意味でAdding Security** できてしまう…のか…？
+
+<!--
+  暗号のオタクとしてはめちゃくちゃアツい。
+  本編スライドで触れたSoftware Updates for Internet of Thingsとかは割とTEEがあることに依存しているところがある
+-->
 
 ----
 
