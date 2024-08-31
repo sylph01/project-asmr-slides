@@ -1,5 +1,5 @@
 ---
-title: Adding Security to Microcontroller Ruby
+title: Updates on PicoRuby Networking, HPKE (and maybe more)
 paginate: true
 marp: true
 theme: argent
