@@ -273,4 +273,15 @@ typedef enum {
 - PicoRubyほか組み込み向けRubyの場合はMbed TLS
 - ブラウザはWebCrypto API経由で使う
 - これらのAPI wrapperを作ると全環境向けのgemが書けるのでは？
-- まだ考えてるだけなのでフィードバックほしい
+
+----
+
+# まだ考えてるだけなので**フィードバックほしい**
+
+- 大統一暗号APIもそうだけどHPKEもPicoRubyのネットワークも
+- 近くこのへんのイベントに物理で出没します
+  - PIXIV DEV MEETUP 2024 (9/20)
+  - Kaigi on Rails (10/25-26)
+  - RubyWorld Conference (12/5-6)
+- もちろんオンラインでも
+  - いい加減Ehime.rbの定例会を再開したい
