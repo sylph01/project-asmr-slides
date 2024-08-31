@@ -111,11 +111,11 @@ RubyKaigiではPicoRubyのWiFiの実装の話をしました。
 
 ----
 
-# WiFi向けビルドでなぜかSHA256がSHA-1になる問題
+# WiFi向けビルドでなぜかSHA256が**SHA-1になる**問題
 
-## ヒント: SHA-1の出力は160bit(20byte)
+## ヒント: SHA-1の出力は**160bit(20byte)**
 
-![bg fit right](images/Screenshot_20240821_090708.png)
+![bg fit right:45%](images/Screenshot_20240821_090708.png)
 
 ----
 
@@ -185,7 +185,7 @@ typedef enum {
 - Mbed TLS 3系依存のコードを微修正
 - ビルドキャッシュに悩まされた
 
-![bg fit right](images/Screenshot_20240823_164353.png)
+![bg fit right:38%](images/Screenshot_20240823_164353.png)
 
 ----
 
