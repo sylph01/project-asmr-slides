@@ -291,3 +291,26 @@ Encrypted Bootの際の暗号化も同 `picotool_postprocess_binary` 内。
   - OTPの値を読む
   - RP2350には乱数生成器(TRNG)がついているのでそれもほしい
   - SHA256のアクセラレータも使える？
+
+---
+
+![bg fit](images/pico2w.png)
+
+---
+
+<!--
+  _class: titlepage_white center
+-->
+
+# Pico 2 W ｸﾙｰｰｰｰ!!!
+## ※日本での発売は技適認証待ち
+
+![bg fit brightness:0.3](images/pico2w.png)
+
+---
+
+# まとめ
+
+- RP2350のセキュアブートやOTPを使ってみたよ
+- 暗号鍵とかを安全に保管できるよ
+- PicoRubyに来るにはもうちょっとやることがあるよ
