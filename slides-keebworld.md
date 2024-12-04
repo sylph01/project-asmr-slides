@@ -11,6 +11,10 @@ theme: argent
 ## Ryo Kajiwara/梶原 龍 (sylph01)
 ### 2024/12/07 @ KeebWorld Conference 2024
 
+<!--
+  35枚で15分なので1枚あたり30秒程度
+-->
+
 ---
 
 # だれ / なに
@@ -28,7 +32,8 @@ theme: argent
 ![bg fit](images/GLMNNTjaIAA_Sog.jpeg)
 
 <!--
-  キーボード的な話をするならば、日常使いのキーボードはKeebioのIrisで、過去に合計7枚組んで4枚が現役、まだ組んでいないPCBが2枚あります。
+  キーボード的な話をするならば、仙台のRubyKaigi 2018で沼に落ちました。
+  日常使いのキーボードはKeebioのIrisで、過去に合計7枚組んで4枚が現役、まだ組んでいないPCBが2枚あります。
   この子はポップンミュージックの蒼井硝子（あおい-しょうこ）ちゃんというキャラクターをモチーフにしたキーキャップであるGMK Shokoと、その色に合う軽量リニアスイッチであるYushakobo Fairy Silent Linear Switchを使っています。軽量リニアスイッチ、いいですよね
 -->
 
@@ -37,7 +42,7 @@ theme: argent
 ![bg fit](images/PXL_20241123_083846365.jpg)
 
 <!--
-  Phyrexia: Keeb Will Be One
+  これはMagic: the GatheringのPhyrexia: All Will Be Oneというセットに合わせて発売されたファイレクシア文字のキーキャップをつけている、”Phyrexia: Keeb Will Be One"と呼んでるキーボードです。キーボードが1枚で足りるわけないのにね。
 -->
 
 ---
@@ -51,6 +56,7 @@ theme: argent
 # 今日の話
 
 - RP2350のセキュアブートで遊んでみた
+- データシートを読んでみた
 - キーボードへのインパクトは？
 - PicoRubyへのインパクトは？
 
@@ -243,7 +249,52 @@ Encrypted Bootの際の暗号化も同 `picotool_postprocess_binary` 内。
 
 ---
 
+---
+
 # データシートを読んでみる
+
+- Chapter 10. Security
+- Chapter 13. OTP
+
+あたりが関係するところ。
+
+Chapter 13にはOTPハードウェアの詳細やシステム利用部分のレイアウトなどが記述してある。
+
+以下、セキュリティ機能(Chapter 10)に関するかなりhigh-levelなoverview。
+
+---
+
+# 10.1.1 Secure Boot
+
+- 署名とはsecp256k1で暗号化されたSHA256ハッシュ
+- 以下の手順で検証される:
+  - バイナリを読み込むときにimage codeとdataからSHA256を計算
+  - imageに含まれる公開鍵を使って署名からハッシュを復号
+  - 最初の手順で得たハッシュと復号で得たハッシュを照合
+  - 得た公開鍵とOTP中の公開鍵フィンガープリントを照合
+
+他にバージョン番号のダウングレード防止もついている。
+
+---
+
+# 10.1.2 Encrypted Boot
+
+- ペイロードのバイナリに対して署名を付与する
+- その後署名まで含めてencryption keyで暗号化する
+- バイナリに復号のためのコードを付与する
+- 復号コードまで含めた署名を改めて計算し付与する
+
+復号化のためのコードはbootromではなくイメージに含まれる。電力解析攻撃の対策が理由とされている（その対策として共通鍵暗号部分のみアップグレードができるようにしている）。
+
+<!--
+  この部分自信ない
+-->
+
+---
+
+# 10.1.3 Isolating Trusted and Untrusted Software
+
+セキュアブートで起動した後はSecureモードとNon-Secureモードのソフトウェアを区別でき、ハードウェアへのアクセスやOTPへのアクセスを制限できるようになる。
 
 ---
 
@@ -289,6 +340,8 @@ Encrypted Bootの際の暗号化も同 `picotool_postprocess_binary` 内。
 
 - RP2350固有の機能をPicoRubyから使うにはPicoRuby側に手を入れる必要がある
   - OTPの値を読む
+    - Secureモードに閉じ込めておきたい
+    - SecureモードとNon-Secureモードの区別？Rubyに対してどうやって見せる？
   - RP2350には乱数生成器(TRNG)がついているのでそれもほしい
   - SHA256のアクセラレータも使える？
 
@@ -314,3 +367,4 @@ Encrypted Bootの際の暗号化も同 `picotool_postprocess_binary` 内。
 - RP2350のセキュアブートやOTPを使ってみたよ
 - 暗号鍵とかを安全に保管できるよ
 - PicoRubyに来るにはもうちょっとやることがあるよ
+    - 然るべきときに話す機会がやってくるかも
