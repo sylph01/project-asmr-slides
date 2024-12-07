@@ -96,7 +96,7 @@ Raspberry Pi Pico 2世代の石。
 # セキュアブート
 
 - Boot Signing
-  - 秘密鍵を使って署名したファームウェアを書き込み、OTPに書き込んだ公開鍵を使って署名を検証
+  - 秘密鍵を使って署名したファームウェアを書き込み、公開鍵を使って（※詳細後述）署名を検証
   - 通常セキュアブートといえばこっち
   - RP2350においては**RISC-Vコアを完全に無効化する**
 - Encrypted Boot
@@ -110,6 +110,10 @@ Raspberry Pi Pico 2世代の石。
 # 実際にやってみる
 
 Raspberry Pi Foundationが主催している "RP2350 Hacking Challenge" (https://github.com/raspberrypi/rp2350_hacking_challenge) というレポジトリにOTPへの書き込みとBoot Signingのサンプルがあるのでそれを試してみる。
+
+<!--
+  このチャレンジ自体は読み取りロックのかかったOTPから秘密の値を抜き出すことが目的ですが、未だ攻略されていないそうです
+-->
 
 ---
 
